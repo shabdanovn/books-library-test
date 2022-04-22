@@ -1,11 +1,13 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useId, useState } from 'react';
 import cn from 'classnames'
 import './CreateBook.scss'
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Layout from '../../components/Layout/Layout';
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { CreateBookType } from '../../types/books';
+import { BookType, CreateBookType } from '../../types/books';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { addBook, getBook, updateBook } from '../../redux/slices/books.slice';
 
 const CreateBook = () => {
     const location = useLocation()
@@ -17,15 +19,24 @@ const CreateBook = () => {
     const [isTitle, setIsTitle] = useState<boolean>(false)
     const [isAuthor, setIsAuthor] = useState<boolean>(false);
     const [isCategory, setIscategory] = useState<boolean>(false)
+    const newId = useId();
+    const dispatch = useAppDispatch()
+    const {book} = useAppSelector(state => state.books)
+    const [bookItem, setBookItem] = useState<BookType|null>(book);
 
 
     useEffect(() => {
-        if(id){
-            setTitle('The paulo')
-            setAuthor('Roberto Man')
-            setCategory('Detective')
-        }
+      if(id) dispatch(getBook(id))
     }, []) 
+
+    useEffect(() => {
+      setBookItem(book)
+      if(book && book.title && book.author && book.category && location.pathname !== '/create-book'){
+        setTitle(book.title);
+        setAuthor(book.author);
+        setCategory(book.category);
+      }
+    }, [book]); 
 
     const saveClick = () => {
         if(!title) setIsTitle(true)
@@ -34,12 +45,15 @@ const CreateBook = () => {
 
         if(title && author && category){
             const book: CreateBookType = {
-            author,
-            title,
-            category,
+              id: id || newId,
+              author,
+              title,
+              category,
             };
 
-            alert(title)
+            if(id) dispatch(updateBook(book))
+            else dispatch(addBook(book))
+        
             navigate('/')
         }
     }
@@ -50,7 +64,7 @@ const CreateBook = () => {
           {location.pathname === "/create-book" ? (
             <h3>Добавить новую книгу</h3>
           ) : (
-            <h3>Редактировать книгу {id}</h3>
+            <h3>Редактировать книгу</h3>
           )}
 
           <div className={cn("create-book-page__content")}>

@@ -1,19 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import BookItem from '../../components/BookItem/BookItem';
 import Layout from '../../components/Layout/Layout';
 import './Main.scss'
 import cn from 'classnames'
 import { BookType } from '../../types/books';
-
-const booksList = [
-    {id: 1, title: "a", author: "B", category: 'a'},
-    {id: 2, title: "c", author: "n", category: 'detective'},
-    {id: 3, title: "h", author: "s", category: 'business'},
-    {id: 4, title: "b", author: "l", category: 'horror'},
-    {id: 5, title: "z", author: "q", category: 'detective'},
-    {id: 6, title: "n", author: "a", category: 'hrama'},
-    {id: 7, title: "d", author: "q", category: 'bio'},
-]
+import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { getAllBooks, getSavedBooks } from '../../redux/slices/books.slice';
 
 enum BookSortType {
     All,
@@ -24,7 +16,18 @@ enum BookSortType {
 
 const Main = () => {
     const [active, setActive] = useState<number>(BookSortType.All)
+    const { books: booksList, isLoading, saved } = useAppSelector((state) => state.books);
     const [books, setBooks] = useState<BookType[]>(booksList)
+    const dispatch = useAppDispatch()
+
+    useEffect(() => {
+      dispatch(getAllBooks())
+      dispatch(getSavedBooks())
+    }, [dispatch])
+
+    useEffect(() => {
+      setBooks(booksList)
+    }, [booksList, saved]);
 
     const allClick = (type:number) => {
         setActive(type)
@@ -67,9 +70,13 @@ const Main = () => {
             </h3>
           </div>
           <div className="main-page__content">
-            {books.map((book) => {
-              return <BookItem key={book.id} book={book} />;
-            })}
+            {books.length === 0 ? (
+              <h3>Нет книг для показа</h3>
+            ) : (
+              books.map((book) => {
+                return <BookItem key={book.id} book={book} />;
+              })
+            )}
           </div>
         </div>
       </Layout>

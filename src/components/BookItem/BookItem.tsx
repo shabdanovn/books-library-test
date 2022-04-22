@@ -6,30 +6,41 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import StarOutlineIcon from "@mui/icons-material/StarOutline";
 import "./BookItem.scss";
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from "../../redux/store";
+import { saveBook, removeSavedBook, removeBook } from '../../redux/slices/books.slice';
 
 interface IBookItem{
     book: BookType
 }
 
 const BookItem = ({book}:IBookItem) => {
-    const [isSaved, setIsSaved] = useState<boolean>(false)
+    const [isSaved, setIsSaved] = useState(false)
     const navigate = useNavigate()
-    const location = useLocation()
+    const dispatch = useAppDispatch()
+    const {saved} = useAppSelector(state => state.books)
 
     useEffect(() => {
-      if(location.pathname==='/favorites') setIsSaved(true)
+      if(saved.find((item:BookType) => item.id === book.id)) 
+        setIsSaved(true)
     }, [])
 
     const saveHandle = () => {
-        setIsSaved(prev => !prev)
+        if(!isSaved){
+          setIsSaved(true)
+          dispatch(saveBook(book));
+        }else{
+          setIsSaved(false);
+          dispatch(removeSavedBook(book.id));
+        }
     }
+
 
     const editHandle = () => {
       navigate(`/edit-book/${book.id}`)
     }
 
     const deleteHandle = () => {
-
+      dispatch(removeBook(book.id))
     }
 
     return (
@@ -52,9 +63,16 @@ const BookItem = ({book}:IBookItem) => {
             />
           )}
 
-          <EditIcon style={{ cursor: "pointer" }} sx={{ fontSize: 30 }} 
-                    onClick={editHandle}/>
-          <DeleteIcon style={{ cursor: "pointer" }} sx={{ fontSize: 30 }} />
+          <EditIcon
+            style={{ cursor: "pointer" }}
+            sx={{ fontSize: 30 }}
+            onClick={editHandle}
+          />
+          <DeleteIcon
+            onClick={deleteHandle}
+            style={{ cursor: "pointer" }}
+            sx={{ fontSize: 30 }}
+          />
         </div>
       </div>
     );
