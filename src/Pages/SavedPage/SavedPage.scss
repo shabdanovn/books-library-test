@@ -1,0 +1,11 @@
+.saved-page{
+    width: 90%;
+
+    &__content{
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+}

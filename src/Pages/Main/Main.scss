@@ -1,0 +1,27 @@
+.main-page{
+    width: 90%;
+
+    &__nav{
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 2px solid rgb(68, 67, 67);
+
+        .nav{
+            cursor: pointer;
+            font-size: clamp(14px, 2.5vw, 20px);
+            &.active{
+                color: blue;
+            }
+        }
+    }
+
+
+    &__content{
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+}

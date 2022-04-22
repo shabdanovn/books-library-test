@@ -1,0 +1,10 @@
+.create-book-page{
+    width: 90%;
+    &__content{
+        width: 100%;
+        height: 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+    }
+}
